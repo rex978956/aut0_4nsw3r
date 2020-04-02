@@ -20,7 +20,7 @@
 // need exec onChangeSubmission(subject)
 
 function fetchAnswer(exam_id) {
-    $.get(`/api/exams/${exam_id}/submissions/storage`, { "exam_paper_instance_id": 0 }, ({ id }) => {
+    $.get(`/api/exams/${exam_id}/submissions/storage`, {"exam_paper_instance_id": 0}, ({id}) => {
         $.get(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
     })
         .fail(() => fetchAnswer(exam_id))
@@ -39,4 +39,4 @@ function ansDataCallback(data) {
 }
 
 
-fetchAnswer(document.getElementById("examId").value)
+fetchAnswer(document.getElementById("examId").value);
