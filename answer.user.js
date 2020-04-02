@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name        iclass auto answer
-// @description auto answer if match the url
+// @description auto answer if match
 // @include     /^http\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
-// @version     1.0
+// @version     1.1
 // @run-at      document-idle
 // @author      @allen0099, @isekai, @Rex65537
 // @updateURL   https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
@@ -57,13 +57,13 @@ function ansDataCallback(data) {
                 break;
             case 'fill_in_blank': {
                 console.log("第 " + (index + 1) + " 題:");
-                data.correct_answers_data.correct_answers[index].correct_answers.forEach(ans => {
+                item.correct_answers.forEach(ans => {
+                    // console.log(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]);
                     subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].focus();
                     subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].value = ans.content + "$";
                     subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].click();
 
                     console.log("==> 第 " + (ans.sort + 1) + " 格", ans.content);
-                    console.log(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]);
                 })
             }
                 break;
