@@ -19,27 +19,24 @@
 // angular change value
 // need exec onChangeSubmission(subject)
 
-// 需要等待 約 10 秒 來等待第一次的 storage 出現，等待 post 發送完畢
-setTimeout(function () {
-    // 取 exam_id
-    const exam_id = document.getElementById("examId").value;
-    console.log("examID = " + exam_id);
+function fetchAnswer(exam_id) {
+    $.get(`/api/exams/${exam_id}/submissions/storage`, { "exam_paper_instance_id": 0 }, ({ id }) => {
+        $.get(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
+    })
+        .fail(() => fetchAnswer(exam_id))
+}
 
-    // 取 correct answer
-    $.get(`/api/exams/${exam_id}/submissions/storage`, ({id}) => {
-        console.log("ID = " + id);
+// Overide this callback
+function ansDataCallback(data) {
+    // Operate with data
+    // Example:
+    alert('Doing ansData parsing')
+    data.correct_answers_data.correct_answers.forEach(
+        ans => {
+            ans.correct_answers.forEach(c => (console.log(c.content)))
+        }
+    )
+}
 
-        $.get(`/api/exams/${exam_id}/submissions/${id}`, data => {
-            data.correct_answers_data.correct_answers.forEach(
-                ans => {
-                    ans.correct_answers.forEach(
-                        c => (
-                            console.log(c.content)
-                        )
-                    )
-                }
-            );
-            alert('Success! See console logs!');
-        })
-    });
-}, 1500);
+
+fetchAnswer(document.getElementById("examId").value)
