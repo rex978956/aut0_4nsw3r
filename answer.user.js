@@ -1,42 +1,87 @@
 // ==UserScript==
 // @name        iclass auto answer
+// @description auto answer if match the url
 // @include     /^http\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
 // @version     1.0
 // @run-at      document-idle
-// @author      meow
-// @description auto answer if match
+// @author      @allen0099, @isekai, @Rex65537
+// @updateURL   https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
+// @downloadURL https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
+// @homepageURL https://github.com/allen0099/autoAnswer
 // ==/UserScript==
 
-
-// GET http://iclass.tku.edu.tw/exam/18569/subjects#/take
-// GET http://iclass.tku.edu.tw/api/exams/{exam_id}/submissions/storage
-// in json["id"] 是 {submission_id}
-//
-// GET http://iclass.tku.edu.tw/api/exams/{exam_id}/submissions/{submission_id}
-// in json["correct_answers_data"]["correct_answers"][0]["correct_answers"][0]["content"] is 第 1 題 第 1 格的答案
-//
-// angular change value
-// need exec onChangeSubmission(subject)
-
 function fetchAnswer(exam_id) {
-    $.get(`/api/exams/${exam_id}/submissions/storage`, {"exam_paper_instance_id": 0}, ({id}) => {
-        $.get(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
+    if (exam_id !== undefined) {
+        console.log("examID = " + exam_id);
+    }
+
+    $.getJSON(`/api/exams/${exam_id}/submissions/storage`, ({id}) => {
+        console.log("ID = " + id);
+        console.log("========== Answer ==========");
+        $.getJSON(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
     })
         .fail(() => fetchAnswer(exam_id))
 }
 
-// Overide this callback
 function ansDataCallback(data) {
-    // Operate with data
-    // Example:
-    alert('Doing ansData parsing')
-    data.correct_answers_data.correct_answers.forEach(
-        ans => {
-            ans.correct_answers.forEach(c => (console.log(c.content)))
+    var subjectHtmlDataList = document.getElementsByClassName("subject-body");
+
+    data.correct_answers_data.correct_answers.forEach(function (item, index) {
+        switch (data.correct_answers_data.correct_answers[index].type) {
+            case 'single_selection': {
+                for (let option in data.subjects_data.subjects[index].options) {
+                    if (data.subjects_data.subjects[index].options[option].is_answer) {
+                        // console.log(
+                        //   subjectHtmlDataList[i].children[0].getElementsByTagName(
+                        //     'input'
+                        //   )[option].checked
+                        // )
+                        console.log(
+                            '第' + (parseInt(index) + 1) + '題:',
+                            String.fromCharCode(parseInt(option) + 65)
+                        );
+                        subjectHtmlDataList[index].children[0].getElementsByTagName(
+                            'input'
+                        )[option].checked = true;
+                        subjectHtmlDataList[index].children[0]
+                            .getElementsByTagName('input')
+                            [option].click()
+                    } else {
+                        subjectHtmlDataList[index].children[0].getElementsByTagName(
+                            'input'
+                        )[option].checked = false
+                    }
+                }
+            }
+                break;
+            case 'fill_in_blank': {
+                console.log("第 " + (index + 1) + " 題:");
+                data.correct_answers_data.correct_answers[index].correct_answers.forEach(ans => {
+                    subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].focus();
+                    subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].value = ans.content + "$";
+                    subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].click();
+
+                    console.log("==> 第 " + (ans.sort + 1) + " 格", ans.content);
+                    console.log(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]);
+                })
+            }
+                break;
+            default: {
+                console.log(
+                    '[ERROR!!]',
+                    data.correct_answers_data.correct_answers[index].type,
+                    "isn't in worklist."
+                )
+                // console.log()
+            }
+                break;
         }
-    )
+    });
+    alert("記得把文字框最後的 $ 刪除喔");
+    alert("確保進度條是完整的 (100%)");
+    alert("Success! See console logs!");
 }
 
-
 fetchAnswer(document.getElementById("examId").value);
+
