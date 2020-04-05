@@ -3,7 +3,7 @@
 // @description auto answer if match
 // @include     /^http\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
-// @version     1.1
+// @version     1.2
 // @run-at      document-idle
 // @author      @allen0099, @isekai, @Rex65537
 // @updateURL   https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
@@ -55,6 +55,19 @@ function ansDataCallback(data) {
                 }
             }
                 break;
+            case "true_or_false": {
+                console.log("第 " + (index + 1) + " 題:");
+                if (item.answer_option_ids[0] === data.subjects_data.subjects[index].options[0].id) {
+                    console.log("是");
+                    subjectHtmlDataList[index].getElementsByClassName("option")[0].children[0].click();
+                } else if (item.answer_option_ids[0] === data.subjects_data.subjects[index].options[1].id) {
+                    console.log("否");
+                    subjectHtmlDataList[index].getElementsByClassName("option")[1].children[0].click();
+                } else {
+                    console.log("[ERROR!] 我不知道");
+                }
+            }
+                break;
             case 'fill_in_blank': {
                 console.log("第 " + (index + 1) + " 題:");
                 item.correct_answers.forEach(ans => {
@@ -84,4 +97,3 @@ function ansDataCallback(data) {
 }
 
 fetchAnswer(document.getElementById("examId").value);
-
