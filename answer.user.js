@@ -3,7 +3,7 @@
 // @description auto answer if match
 // @include     /^http\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
-// @version     1.2
+// @version     1.3
 // @run-at      document-idle
 // @author      @allen0099, @isekai, @Rex65537
 // @updateURL   https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
@@ -91,9 +91,6 @@ function ansDataCallback(data) {
                 break;
         }
     });
-    alert("記得把文字框最後的 $ 刪除喔");
-    alert("確保進度條是完整的 (100%)");
-    alert("Success! See console logs!");
 }
 
 fetchAnswer(document.getElementById("examId").value);
