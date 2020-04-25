@@ -3,9 +3,9 @@
 // @description auto answer if match
 // @include     /^http\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
-// @version     1.3
+// @version     2.0
 // @run-at      document-idle
-// @author      @allen0099, @isekai, @Rex65537
+// @author      @allen0099
 // @updateURL   https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
 // @downloadURL https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
 // @homepageURL https://github.com/allen0099/autoAnswer
@@ -25,69 +25,144 @@ function fetchAnswer(exam_id) {
 }
 
 function ansDataCallback(data) {
-    var subjectHtmlDataList = document.getElementsByClassName("subject-body");
+    var subjectHtmlDataList = document.getElementsByClassName("subject-body"); // include analysis
+    var real_body = []; // remove analysis
 
-    data.correct_answers_data.correct_answers.forEach(function (item, index) {
-        switch (data.correct_answers_data.correct_answers[index].type) {
-            case 'single_selection': {
-                for (let option in data.subjects_data.subjects[index].options) {
-                    if (data.subjects_data.subjects[index].options[option].is_answer) {
-                        // console.log(
-                        //   subjectHtmlDataList[i].children[0].getElementsByTagName(
-                        //     'input'
-                        //   )[option].checked
-                        // )
-                        console.log(
-                            '第' + (parseInt(index) + 1) + '題:',
-                            String.fromCharCode(parseInt(option) + 65)
-                        );
-                        subjectHtmlDataList[index].children[0].getElementsByTagName(
-                            'input'
-                        )[option].checked = true;
-                        subjectHtmlDataList[index].children[0]
-                            .getElementsByTagName('input')
-                            [option].click()
+    for (let i = 0; i < subjectHtmlDataList.length; i++) {
+        if (subjectHtmlDataList[i].getElementsByClassName("subject-body").length === 0) {
+            real_body.push(subjectHtmlDataList[i]);
+        }
+    }
+
+    var subjects = data.subjects_data.subjects;
+    var real_subjects = [];
+
+    for (let i = 0; i < subjects.length; i++) {
+        if (subjects[i].type !== "analysis") {
+            real_subjects.push(subjects[i]);
+        } else {
+            for (let j = 0; j < subjects[i].sub_subjects.length; j++) {
+                real_subjects.push(subjects[i].sub_subjects[j]);
+            }
+        }
+    }
+
+    var single = [];
+    var multiple = [];
+    var true_or_false = [];
+    var fill_in_blank = [];
+    var short_answer = [];
+    var analysis = [];
+
+    console.log("===題目分析中===");
+    subjects.forEach(function (item, index) {
+        switch (item.type) {
+            case "single_selection":
+                console.log("第 " + (index + 1) + " 單選題");
+                single.push(item);
+                break;
+            case "multiple_selection":
+                console.log("第 " + (index + 1) + " 多選題");
+                multiple.push(item);
+                break;
+            case "true_or_false":
+                console.log("第 " + (index + 1) + " 是非題");
+                true_or_false.push(item);
+                break;
+            case "fill_in_blank":
+                console.log("第 " + (index + 1) + " 填空題");
+                fill_in_blank.push(item);
+                break;
+            case "short_answer":
+                console.log("第 " + (index + 1) + " 簡答題");
+                short_answer.push(item);
+                break;
+            case "analysis":
+                console.log("第 " + (index + 1) + " 題組");
+                analysis.push(item);
+                break;
+            default:
+                console.log("第 " + (index + 1) + " 題，類型 " + item.type + " 尚未支援");
+                break;
+        }
+    });
+
+    console.log("===分析結果===");
+    console.log("單選共有 " + single.length + " 題");
+    console.log("多選共有 " + multiple.length + " 題");
+    console.log("是非共有 " + true_or_false.length + " 題");
+    console.log("填空共有 " + fill_in_blank.length + " 題");
+    console.log("簡答共有 " + short_answer.length + " 題");
+    console.log("題組共有 " + analysis.length + " 題");
+
+    console.log("===試圖作答===");
+    real_subjects.forEach(function (item, index) {
+        switch (item.type) {
+            case "single_selection":
+                console.log("第 " + (index + 1) + " 單選題");
+                item.options.forEach(function (item_option, index_option) {
+                    if (item_option.is_answer) {
+                        console.log(String.fromCharCode(parseInt(index_option) + 65));
+                        real_body[index].getElementsByTagName("input")[index_option].checked = true;
+                        real_body[index].getElementsByTagName("input")[index_option].click();
                     } else {
-                        subjectHtmlDataList[index].children[0].getElementsByTagName(
-                            'input'
-                        )[option].checked = false
+                        real_body[index].getElementsByTagName("input")[index_option].checked = false;
                     }
-                }
-            }
+                });
                 break;
-            case "true_or_false": {
-                console.log("第 " + (index + 1) + " 題:");
-                if (item.answer_option_ids[0] === data.subjects_data.subjects[index].options[0].id) {
-                    console.log("是");
-                    subjectHtmlDataList[index].getElementsByClassName("option")[0].children[0].click();
-                } else if (item.answer_option_ids[0] === data.subjects_data.subjects[index].options[1].id) {
-                    console.log("否");
-                    subjectHtmlDataList[index].getElementsByClassName("option")[1].children[0].click();
-                } else {
-                    console.log("[ERROR!] 我不知道");
-                }
-            }
+            case "multiple_selection":
+                console.log("第 " + (index + 1) + " 多選題");
+                item.options.forEach(function (item_option, index_option) {
+                    if (item_option.is_answer) {
+                        console.log(String.fromCharCode(parseInt(index_option) + 65));
+                        if (!real_body[index].getElementsByTagName("input")[index_option].checked) {
+                            real_body[index].getElementsByTagName("input")[index_option].click();
+                        }
+                    } else {
+                        if (real_body[index].getElementsByTagName("input")[index_option].checked) {
+                            real_body[index].getElementsByTagName("input")[index_option].click();
+                        }
+                    }
+                });
                 break;
-            case 'fill_in_blank': {
-                console.log("第 " + (index + 1) + " 題:");
+            case "true_or_false":
+                console.log("第 " + (index + 1) + " 是非題");
+                item.options.forEach(function (item_option, index_option) {
+                    if (item_option.is_answer) {
+                        console.log(String.fromCharCode(parseInt(index_option) + 65));
+                        if (!real_body[index].getElementsByTagName("input")[index_option].checked) {
+                            real_body[index].getElementsByTagName("input")[index_option].click();
+                        }
+                    } else {
+                        if (real_body[index].getElementsByTagName("input")[index_option].checked) {
+                            real_body[index].getElementsByTagName("input")[index_option].click();
+                        }
+                    }
+                });
+                break;
+            case "fill_in_blank":
+                console.log("第 " + (index + 1) + " 填空題");
                 item.correct_answers.forEach(ans => {
                     // console.log(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]);
                     subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].focus();
                     subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].value = ans.content + "$";
                     subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].click();
 
-                    console.log("==> 第 " + (ans.sort + 1) + " 格", ans.content);
-                })
-            }
+                    console.log("==> 第 " + (ans.sort + 1) + " 格");
+                    console.log(ans.content);
+                });
                 break;
-            default: {
-                console.log(
-                    '[ERROR!!]',
-                    data.correct_answers_data.correct_answers[index].type,
-                    "isn't in worklist."
-                )
-                // console.log()
-            }
+            case "short_answer":
+                console.log("第 " + (index + 1) + " 簡答題");
+                console.log("==> 簡答題無正確答案，請自行填答");
+                break;
+            case "analysis":
+                console.log("第 " + (index + 1) + " 題組");
+                console.log(item.sub_subjects);
+                break;
+            default:
+                console.log("第 " + (index + 1) + " 題，類型 " + item.type + " 尚未支援");
+                console.log(item);
                 break;
         }
     });
