@@ -20,8 +20,9 @@
 2. 擴充套件安裝完成後點擊 [安裝連結](https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js)
 3. 完成
 
-## 關於
+## About
 
+現已支援：單選、多選、是非、填空、題組（單選、多選、是非）  
 既然都來了，那就給個星星再走吧  
  **低調使用低調分享，請勿分享於任何公開平台**  
 
