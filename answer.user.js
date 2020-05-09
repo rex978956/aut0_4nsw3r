@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name        auto answer
 // @description auto answer if match the rules
-// @include     /^http\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
+// @include     /^https?\:\/\/ono.tp.edu.tw\/exam\/\d+\/subjects#\/take$/
+// @include     /^https?\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
+// @include     /^https?\:\/\/elearn2.fju.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @include     /^https?\:\/\/tronclass.mkc.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
-// @version     2.1
+// @version     2.2
 // @run-at      document-idle
 // @author      @allen0099
 // @updateURL   https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
