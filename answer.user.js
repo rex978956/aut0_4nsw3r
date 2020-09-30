@@ -147,10 +147,8 @@ function ansDataCallback(data) {
                 console.log("第 " + (index + 1) + " 填空題");
                 item.correct_answers.forEach(ans => {
                     // console.log(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]);
-                    subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].focus();
-                    subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].value = ans.content + "$";
-                    subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort].click();
-
+                    $(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]).val(ans.content);
+                    $(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]).change();
                     console.log("==> 第 " + (ans.sort + 1) + " 格");
                     console.log(ans.content);
                 });
