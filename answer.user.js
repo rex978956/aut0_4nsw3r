@@ -19,11 +19,11 @@ function fetchAnswer(exam_id) {
         console.log("examID = " + exam_id);
     }
 
-    $.getJSON(`/api/exams/${exam_id}/submissions/storage`, ({id}) => {
-        console.log("ID = " + id);
-        console.log("========== Answer ==========");
-        $.getJSON(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
-    })
+    $.getJSON(`/api/exams/${exam_id}/submissions/storage`, ({ id }) => {
+            console.log("ID = " + id);
+            console.log("========== Answer ==========");
+            $.getJSON(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
+        })
         .fail(() => fetchAnswer(exam_id))
 }
 
@@ -58,7 +58,7 @@ function ansDataCallback(data) {
     var analysis = [];
 
     console.log("===題目分析中===");
-    subjects.forEach(function (item, index) {
+    subjects.forEach(function(item, index) {
         switch (item.type) {
             case "single_selection":
                 console.log("第 " + (index + 1) + " 單選題");
@@ -99,11 +99,11 @@ function ansDataCallback(data) {
     console.log("題組共有 " + analysis.length + " 題");
 
     console.log("===試圖作答===");
-    real_subjects.forEach(function (item, index) {
+    real_subjects.forEach(function(item, index) {
         switch (item.type) {
             case "single_selection":
                 console.log("第 " + (index + 1) + " 單選題");
-                item.options.forEach(function (item_option, index_option) {
+                item.options.forEach(function(item_option, index_option) {
                     if (item_option.is_answer) {
                         console.log(String.fromCharCode(parseInt(index_option) + 65));
                         real_body[index].getElementsByTagName("input")[index_option].checked = true;
@@ -115,7 +115,7 @@ function ansDataCallback(data) {
                 break;
             case "multiple_selection":
                 console.log("第 " + (index + 1) + " 多選題");
-                item.options.forEach(function (item_option, index_option) {
+                item.options.forEach(function(item_option, index_option) {
                     if (item_option.is_answer) {
                         console.log(String.fromCharCode(parseInt(index_option) + 65));
                         if (!real_body[index].getElementsByTagName("input")[index_option].checked) {
@@ -130,7 +130,7 @@ function ansDataCallback(data) {
                 break;
             case "true_or_false":
                 console.log("第 " + (index + 1) + " 是非題");
-                item.options.forEach(function (item_option, index_option) {
+                item.options.forEach(function(item_option, index_option) {
                     if (item_option.is_answer) {
                         console.log(String.fromCharCode(parseInt(index_option) + 65));
                         if (!real_body[index].getElementsByTagName("input")[index_option].checked) {
