@@ -6,7 +6,7 @@
 // @include     /^https?\:\/\/elearn2.fju.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @include     /^https?\:\/\/tronclass.mkc.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
-// @version     2.2
+// @version     2.3
 // @run-at      document-idle
 // @author      @allen0099
 // @updateURL   https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
