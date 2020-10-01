@@ -4,9 +4,9 @@
 // @include     /^https?\:\/\/ono.tp.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @include     /^https?\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @include     /^https?\:\/\/elearn2.fju.edu.tw\/exam\/\d+\/subjects#\/take$/
-// @include     /^https?\:\/\/tronclass.mkc.edu.tw\/exam\/\d+\/subjects#\/take$/
+// @include     /^https?\:\/\/tronclass.com.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
-// @version     2.3
+// @version     2.2
 // @run-at      document-idle
 // @author      @allen0099
 // @updateURL   https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
@@ -19,11 +19,11 @@ function fetchAnswer(exam_id) {
         console.log("examID = " + exam_id);
     }
 
-    $.getJSON(`/api/exams/${exam_id}/submissions/storage`, ({ id }) => {
-            console.log("ID = " + id);
-            console.log("========== Answer ==========");
-            $.getJSON(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
-        })
+    $.getJSON(`/api/exams/${exam_id}/submissions/storage`, ({id}) => {
+        console.log("ID = " + id);
+        console.log("========== Answer ==========");
+        $.getJSON(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
+    })
         .fail(() => fetchAnswer(exam_id))
 }
 
@@ -58,7 +58,7 @@ function ansDataCallback(data) {
     var analysis = [];
 
     console.log("===題目分析中===");
-    subjects.forEach(function(item, index) {
+    subjects.forEach(function (item, index) {
         switch (item.type) {
             case "single_selection":
                 console.log("第 " + (index + 1) + " 單選題");
@@ -99,11 +99,28 @@ function ansDataCallback(data) {
     console.log("題組共有 " + analysis.length + " 題");
 
     console.log("===試圖作答===");
-    real_subjects.forEach(function(item, index) {
+    var p = document.createElement("p")
+    p.innerHTML = "<span>請在<strong>離開視窗倒數時間內</strong>，貼這 <code>window.onblur = ()=>{return false}</code> 到 console 裡面，即可</span>"
+    var p1 = document.createElement("p")
+    p1.innerHTML = "請確認答題進度是否全答完，若不是滿題則請重新填選答案(多按一次之類的)。"
+    var p2 = document.createElement("p")
+    p2.innerHTML = "下面是各題的內容，如果上面答案有問題，可以參照下方資料填寫進去。"
+    var element = document.getElementsByTagName("body")[0]
+    element.appendChild(p1);
+    element.appendChild(p);
+    element.appendChild(p2);
+  
+    real_subjects.forEach(function (item, index) {
+        var tag = document.createElement("pre");
+        tag.innerText = JSON.stringify(item, undefined, 2)
+        var element = document.getElementsByTagName("body")[0]
+        element.appendChild(tag);
+        var br = document.createElement("br")
+        element.appendChild(br);
         switch (item.type) {
             case "single_selection":
                 console.log("第 " + (index + 1) + " 單選題");
-                item.options.forEach(function(item_option, index_option) {
+                item.options.forEach(function (item_option, index_option) {
                     if (item_option.is_answer) {
                         console.log(String.fromCharCode(parseInt(index_option) + 65));
                         real_body[index].getElementsByTagName("input")[index_option].checked = true;
@@ -115,7 +132,7 @@ function ansDataCallback(data) {
                 break;
             case "multiple_selection":
                 console.log("第 " + (index + 1) + " 多選題");
-                item.options.forEach(function(item_option, index_option) {
+                item.options.forEach(function (item_option, index_option) {
                     if (item_option.is_answer) {
                         console.log(String.fromCharCode(parseInt(index_option) + 65));
                         if (!real_body[index].getElementsByTagName("input")[index_option].checked) {
@@ -130,7 +147,7 @@ function ansDataCallback(data) {
                 break;
             case "true_or_false":
                 console.log("第 " + (index + 1) + " 是非題");
-                item.options.forEach(function(item_option, index_option) {
+                item.options.forEach(function (item_option, index_option) {
                     if (item_option.is_answer) {
                         console.log(String.fromCharCode(parseInt(index_option) + 65));
                         if (!real_body[index].getElementsByTagName("input")[index_option].checked) {
@@ -147,14 +164,16 @@ function ansDataCallback(data) {
                 console.log("第 " + (index + 1) + " 填空題");
                 item.correct_answers.forEach(ans => {
                     // console.log(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]);
-                    $(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]).val(ans.content);
-                    $(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]).change();
+                    real_body[index].getElementsByClassName("content")[ans.sort].value = ans.content + "$";
+
                     console.log("==> 第 " + (ans.sort + 1) + " 格");
                     console.log(ans.content);
                 });
                 break;
             case "short_answer":
                 console.log("第 " + (index + 1) + " 簡答題");
+                // console.log(item)
+                real_body[index].getElementsByClassName("short-answer-take")[0].value = item.answer_explanation + "$這只是答案的敘述，可能會沒有";
                 console.log("==> 簡答題無正確答案，請自行填答");
                 break;
             case "analysis":
@@ -169,4 +188,9 @@ function ansDataCallback(data) {
     });
 }
 
-fetchAnswer(document.getElementById("examId").value);
+
+
+fetchAnswer(document.getElementById("examId").value)
+alert('使用時，請小心周遭人士眼線(?)')
+alert('最好每一個答案都要重新選擇一次 以免送出後結果沒有答案')
+
