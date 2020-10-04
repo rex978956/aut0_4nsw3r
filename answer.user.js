@@ -4,9 +4,9 @@
 // @include     /^https?\:\/\/ono.tp.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @include     /^https?\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @include     /^https?\:\/\/elearn2.fju.edu.tw\/exam\/\d+\/subjects#\/take$/
-// @include     /^https?\:\/\/tronclass.com.tw\/exam\/\d+\/subjects#\/take$/
+// // @include     /^https?\:\/\/tronclass.mkc.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
-// @version     2.2
+// @version     2.4
 // @run-at      document-idle
 // @author      @allen0099
 // @updateURL   https://raw.githubusercontent.com/allen0099/autoAnswer/master/answer.user.js
@@ -19,11 +19,11 @@ function fetchAnswer(exam_id) {
         console.log("examID = " + exam_id);
     }
 
-    $.getJSON(`/api/exams/${exam_id}/submissions/storage`, ({id}) => {
-        console.log("ID = " + id);
-        console.log("========== Answer ==========");
-        $.getJSON(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
-    })
+    $.getJSON(`/api/exams/${exam_id}/submissions/storage`, ({ id }) => {
+            console.log("ID = " + id);
+            console.log("========== Answer ==========");
+            $.getJSON(`/api/exams/${exam_id}/submissions/${id}`, ansDataCallback)
+        })
         .fail(() => fetchAnswer(exam_id))
 }
 
@@ -58,7 +58,7 @@ function ansDataCallback(data) {
     var analysis = [];
 
     console.log("===題目分析中===");
-    subjects.forEach(function (item, index) {
+    subjects.forEach(function(item, index) {
         switch (item.type) {
             case "single_selection":
                 console.log("第 " + (index + 1) + " 單選題");
@@ -120,7 +120,7 @@ function ansDataCallback(data) {
         switch (item.type) {
             case "single_selection":
                 console.log("第 " + (index + 1) + " 單選題");
-                item.options.forEach(function (item_option, index_option) {
+                item.options.forEach(function(item_option, index_option) {
                     if (item_option.is_answer) {
                         console.log(String.fromCharCode(parseInt(index_option) + 65));
                         real_body[index].getElementsByTagName("input")[index_option].checked = true;
@@ -132,7 +132,7 @@ function ansDataCallback(data) {
                 break;
             case "multiple_selection":
                 console.log("第 " + (index + 1) + " 多選題");
-                item.options.forEach(function (item_option, index_option) {
+                item.options.forEach(function(item_option, index_option) {
                     if (item_option.is_answer) {
                         console.log(String.fromCharCode(parseInt(index_option) + 65));
                         if (!real_body[index].getElementsByTagName("input")[index_option].checked) {
@@ -147,7 +147,7 @@ function ansDataCallback(data) {
                 break;
             case "true_or_false":
                 console.log("第 " + (index + 1) + " 是非題");
-                item.options.forEach(function (item_option, index_option) {
+                item.options.forEach(function(item_option, index_option) {
                     if (item_option.is_answer) {
                         console.log(String.fromCharCode(parseInt(index_option) + 65));
                         if (!real_body[index].getElementsByTagName("input")[index_option].checked) {
@@ -164,7 +164,8 @@ function ansDataCallback(data) {
                 console.log("第 " + (index + 1) + " 填空題");
                 item.correct_answers.forEach(ans => {
                     // console.log(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]);
-                    real_body[index].getElementsByClassName("content")[ans.sort].value = ans.content + "$";
+                    $(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]).val(ans.content);
+                    $(subjectHtmlDataList[index].getElementsByClassName("content")[ans.sort]).change();
 
                     console.log("==> 第 " + (ans.sort + 1) + " 格");
                     console.log(ans.content);
