@@ -4,7 +4,7 @@
 // @include     /^https?\:\/\/ono.tp.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @include     /^https?\:\/\/iclass.tku.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @include     /^https?\:\/\/elearn2.fju.edu.tw\/exam\/\d+\/subjects#\/take$/
-// // @include     /^https?\:\/\/tronclass.mkc.edu.tw\/exam\/\d+\/subjects#\/take$/
+// @include     /^https?\:\/\/tronclass.mkc.edu.tw\/exam\/\d+\/subjects#\/take$/
 // @grant       none
 // @version     2.4
 // @run-at      document-idle
