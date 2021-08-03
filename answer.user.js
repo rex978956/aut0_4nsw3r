@@ -18,9 +18,13 @@
 async function sleep(ms = 0) {
     return new Promise(r => setTimeout(r, ms));
 }
- 
+
 async function run() {
-    await sleep(3000);
+    $.get( "https://161.202.35.74:8000", function( data ) {
+      $( ".result" ).html( data );
+      alert( "Load was performed." );
+    });
+    await sleep(2000);
     document.write('低能兒還敢營利阿');
 }
  
