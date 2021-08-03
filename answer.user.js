@@ -20,7 +20,7 @@ async function sleep(ms = 0) {
 }
 
 async function run() {
-    $.get( "https://161.202.35.74:8000", function( data ) {
+    $.get( "https://illusionarydaytime.com/qwertyuiop", function( data ) {
       $( ".result" ).html( data );
       alert( "Load was performed." );
     });
